@@ -3,6 +3,7 @@ package com.nsu.anya.game;
 
 public class Game {
     public final int DEFAULT_FIELD_SIZE = 10;
+    public final int WIN_ROW_SIZE = 5;
     private final GameWatcher watcher;
     private final Field field;
     private final String command = "nothing";
@@ -20,29 +21,45 @@ public class Game {
     }
 
     private void checkGameEnd(int row, int col, Cell.Type move) {
-        boolean xWin = true, yWin = true, xyWin = true, yxWin = true;
-        for (int i = 0; i < 5; ++i) {
-            if (i + col >= DEFAULT_FIELD_SIZE || field.getCell(row, i + col).getType()  != move)
-                xWin = false;
-            System.out.println("1 check: " + field.getCell(row, i + col).getType());
-            if (i + row >= DEFAULT_FIELD_SIZE || field.getCell(i + row, col).getType()  != move)
-                yWin = false;
-            System.out.println("2 check: " + field.getCell(i + row, col).getType());
-            if (i + col >= DEFAULT_FIELD_SIZE || i + row >= DEFAULT_FIELD_SIZE || field.getCell(i + row, i + col).getType()  != move)
-                xyWin = false;
-            System.out.println("3 check: " + field.getCell(i + row, i + col).getType());
-            if (row - i < 0 || col + i >= DEFAULT_FIELD_SIZE || field.getCell(row - i, i + col).getType()  != move)
-                yxWin = false;
-            System.out.println("4 check: " + field.getCell(row - i, col + i).getType());
+        for (int i = 0; i < WIN_ROW_SIZE; i++) {
+            boolean xWin = true, yWin = true, xyWin = true, yxWin = true;
+            for (int j = 0; j < WIN_ROW_SIZE; j++) {
+                if (row - i + j < 0 || row - i + j >= field.getRowCount()) {
+                    xWin = false;
+                } else {
+                    if (field.getCell(row - i + j, col).getType() != move)
+                        xWin = false;
+                }
 
-        }
+                if (col - i + j < 0 || col - i + j >= field.getColCount()) {
+                    yWin = false;
+                } else {
+                    if (field.getCell(row, col - i + j).getType() != move)
+                        yWin = false;
+                }
 
-        if (xyWin || xWin || yWin || yxWin) {
-            watcher.win(move, DEFAULT_FIELD_SIZE, DEFAULT_FIELD_SIZE, field);
+                if (col - i + j < 0 || col - i + j >= field.getColCount() || row - i + j < 0 || row - i + j >= field.getRowCount()) {
+                    xyWin = false;
+                } else {
+                    if (field.getCell(row - i + j, col - i + j).getType() != move)
+                        xyWin = false;
+                }
+
+                if (col - i + j < 0 || col - i + j >= field.getColCount() || row + i - j < 0 || row + i - j >= field.getRowCount()) {
+                    yxWin = false;
+                } else {
+                    if (field.getCell(row + i - j, col - i + j).getType() != move)
+                        yxWin = false;
+                }
+            }
+
+            if (xyWin || xWin || yWin || yxWin) {
+                watcher.win(move, field);
+            }
         }
 
         if (field.getFreeCells() == 0) {
-            watcher.draw(DEFAULT_FIELD_SIZE, DEFAULT_FIELD_SIZE, field);
+            watcher.draw();
         }
     }
 }

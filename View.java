@@ -53,8 +53,8 @@ public class View extends JFrame implements GameWatcher {
     }
 
     @Override
-    public void win(Cell.Type player, int row, int col, Field field) {
-        updateField(field, Cell.Type.X, row, col, disactiveCommand);
+    public void win(Cell.Type player, Field field) {
+        updateField(field, Cell.Type.X, field.getRowCount(), field.getColCount(), disactiveCommand);
         if (player == Cell.Type.X) {
             m_message.setText("Победил: Х");
         }
@@ -64,8 +64,7 @@ public class View extends JFrame implements GameWatcher {
     }
 
     @Override
-    public void draw(int row, int col, Field field) {
-
+    public void draw() {
         m_message.setText("Ничья");
     }
 
