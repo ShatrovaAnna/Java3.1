@@ -6,17 +6,14 @@ import com.nsu.anya.game.GameWatcher;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.Objects;
 
 public class View extends JFrame implements GameWatcher {
-    private Controller controller;
-    private JButton m_newGame;
-    private JLabel m_message;
-    private JPanel gameFieldPanel;
-    private JPanel gridPanel;
+    private static Controller controller;
+    private final JLabel m_message;
+    public static JPanel gameFieldPanel;
+    public static JPanel gridPanel;
     private final String disactiveCommand = "disactive";
-    private  JButton  m_buttons[][];
 
     public View() throws HeadlessException {
         super("Game Window");
@@ -32,9 +29,9 @@ public class View extends JFrame implements GameWatcher {
         m_message = new JLabel("Игра не начата");
         m_message.setSize(new Dimension(80, 40));
 
-        m_newGame = new JButton("Новая игра");
+        JButton m_newGame = new JButton("Новая игра");
         m_newGame.setSize(new Dimension(80, 40));
-        m_newGame.addActionListener(gameStartActionListener());
+        m_newGame.addActionListener(controller.gameStartActionListener());
 
         toolbarPanel.add(m_message);
         toolbarPanel.add(m_newGame);
@@ -88,12 +85,12 @@ public class View extends JFrame implements GameWatcher {
                 if (cell.getType() != Cell.Type.EMPTY) {
                      newButton.setEnabled(false);
                 }
-                if (status == "disactive"){
+                if (Objects.equals(status, "disactive")){
                     newButton.setEnabled(false);
                 }
 
                 newButton.setVisible(true);
-                newButton.addActionListener(moveActionListener(i, j, move));
+                newButton.addActionListener(controller.moveActionListener(i, j, move));
 
                 gridPanel.add(newButton);
             }
@@ -102,40 +99,5 @@ public class View extends JFrame implements GameWatcher {
         gridPanel.setEnabled(true);
         gridPanel.setVisible(true);
         gameFieldPanel.add(gridPanel);
-    }
-
-    public class GameStartActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (gridPanel != null) {
-                gameFieldPanel.remove(gridPanel);
-            }
-            controller.startNewGame();
-        }
-    }
-
-    public class MoveActionListener implements ActionListener {
-        private final Cell.Type move;
-        private final int row;
-        private final int col;
-
-        public MoveActionListener(int row, int col, Cell.Type move) {
-            this.row = row;
-            this.col = col;
-            this.move = move;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            controller.move(row, col, move);
-        }
-    }
-
-    public ActionListener gameStartActionListener() {
-        return new GameStartActionListener();
-    }
-
-    public ActionListener moveActionListener(int row, int col, Cell.Type move) {
-        return new MoveActionListener(row, col, move);
     }
 }
